@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { LOCATIONS } from '../../db/data';
+import Select from './Select';
+
+const LOCATION_OPTIONS = [
+  { value: '', label: 'Any location' },
+  ...LOCATIONS.map((city) => ({ value: city, label: city })),
+];
 
 type Props = {
   initial: string;
@@ -39,10 +45,15 @@ export default function SearchBar({ initial, location, onSearch, onLocation, tot
   }, [value, initial]);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-brand-900 via-brand-700 to-fuchsia-700">
-      {/* soft light blooms, purely decorative */}
-      <div className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-fuchsia-500/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 right-0 size-80 rounded-full bg-violet-400/20 blur-3xl" />
+    // z-20 keeps an open dropdown above the results below. The section itself
+    // must NOT clip, or the dropdown panel is cut off at the hero's edge.
+    <section className="relative z-20 bg-gradient-to-br from-brand-900 via-brand-700 to-fuchsia-700">
+      {/* Decorative blooms get their own clipping layer so they stay inside the
+          hero without the section needing overflow-hidden. */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-24 -top-24 size-72 rounded-full bg-fuchsia-500/30 blur-3xl" />
+        <div className="absolute -bottom-32 right-0 size-80 rounded-full bg-violet-400/20 blur-3xl" />
+      </div>
 
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
         <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white ring-1 ring-white/20">
@@ -83,31 +94,28 @@ export default function SearchBar({ initial, location, onSearch, onLocation, tot
 
           <div className="hidden h-8 w-px bg-slate-200 sm:block" />
 
-          <div className="flex items-center gap-2 px-3">
-            <svg
-              className="size-5 shrink-0 text-slate-400"
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <path d="M10 18s6-5.2 6-9a6 6 0 1 0-12 0c0 3.8 6 9 6 9Z" />
-              <circle cx="10" cy="9" r="2" />
-            </svg>
-            <select
+          <div className="px-3 sm:min-w-52">
+            <Select
               value={location}
-              onChange={(event) => onLocation(event.target.value)}
-              aria-label="Filter by location"
-              className="w-full min-w-36 bg-transparent py-3 text-base text-slate-900 outline-none sm:w-auto"
-            >
-              <option value="">Any location</option>
-              {LOCATIONS.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+              onChange={onLocation}
+              ariaLabel="Filter by location"
+              placeholder="Any location"
+              options={LOCATION_OPTIONS}
+              triggerClass="py-3 text-base text-slate-900 outline-none rounded-lg focus-visible:ring-2 focus-visible:ring-brand-200"
+              icon={
+                <svg
+                  className="size-5 shrink-0 text-slate-400"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                >
+                  <path d="M10 18s6-5.2 6-9a6 6 0 1 0-12 0c0 3.8 6 9 6 9Z" />
+                  <circle cx="10" cy="9" r="2" />
+                </svg>
+              }
+            />
           </div>
         </div>
       </div>

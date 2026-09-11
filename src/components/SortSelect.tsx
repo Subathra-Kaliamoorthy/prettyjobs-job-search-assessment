@@ -1,3 +1,5 @@
+import Select from './Select';
+
 type Props = {
   value: string;
   onChange: (sort: string) => void;
@@ -12,19 +14,16 @@ const OPTIONS = [
 
 export default function SortSelect({ value, onChange }: Props) {
   return (
-    <label className="flex items-center gap-2 text-sm text-slate-500">
-      Sort
-      <select
-        className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+    <div className="flex items-center gap-2 text-sm text-slate-500">
+      <span className="shrink-0">Sort</span>
+      <Select
         value={value || 'newest'}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
+        options={OPTIONS}
+        onChange={onChange}
+        ariaLabel="Sort jobs"
+        align="right"
+        triggerClass="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 outline-none transition hover:border-brand-400 focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-100"
+      />
+    </div>
   );
 }
