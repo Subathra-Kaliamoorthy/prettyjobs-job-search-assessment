@@ -91,10 +91,10 @@ export default function JobsPage() {
   return (
     <>
       <SearchBar
-        initial={searchParams.get('q') ?? ''}
-        location={searchParams.get('location') ?? ''}
-        onSearch={(keyword) => update({ q: keyword })}
-        onLocation={(location) => update({ location })}
+        initialKeyword={searchParams.get('q') ?? ''}
+        initialLocation={searchParams.get('location') ?? ''}
+        // Keyword and location are applied together, on submit.
+        onSearch={(keyword, location) => update({ q: keyword, location })}
         total={data?.total ?? 0}
       />
 

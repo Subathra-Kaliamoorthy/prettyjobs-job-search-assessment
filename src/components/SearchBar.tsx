@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LOCATIONS } from '../../shared/constants';
 import Select from './Select';
 
@@ -8,41 +8,30 @@ const LOCATION_OPTIONS = [
 ];
 
 type Props = {
-  initial: string;
-  location: string;
-  onSearch: (keyword: string) => void;
-  onLocation: (location: string) => void;
+  initialKeyword: string;
+  initialLocation: string;
+  onSearch: (keyword: string, location: string) => void;
   total: number;
 };
 
-export default function SearchBar({ initial, location, onSearch, onLocation, total }: Props) {
-  const [value, setValue] = useState(initial);
+export default function SearchBar({ initialKeyword, initialLocation, onSearch, total }: Props) {
+  // Keyword and location are held locally and applied only on submit, so the
+  // query bar behaves like a form. The sidebar filters stay instant.
+  const [keyword, setKeyword] = useState(initialKeyword);
+  const [location, setLocation] = useState(initialLocation);
 
-  // `onSearch` is a fresh closure every render. Holding it in a ref lets the
-  // debounce effect depend only on the value while still calling the latest
-  // version — otherwise a pending timer fires against stale URL state.
-  const onSearchRef = useRef(onSearch);
-  onSearchRef.current = onSearch;
+  // Resync when the URL changes from elsewhere: back button, "Clear all".
+  useEffect(() => setKeyword(initialKeyword), [initialKeyword]);
+  useEffect(() => setLocation(initialLocation), [initialLocation]);
 
-  // Tracks the value we last pushed to the URL, so an inbound `initial` that
-  // merely echoes our own push does not clobber newer keystrokes.
-  const lastPushed = useRef(initial);
+  // Typing without submitting would otherwise look like a broken search, so
+  // the UI advertises that there is something waiting to be applied.
+  const dirty = keyword !== initialKeyword || location !== initialLocation;
 
-  useEffect(() => {
-    if (initial !== lastPushed.current) {
-      lastPushed.current = initial;
-      setValue(initial);
-    }
-  }, [initial]);
-
-  useEffect(() => {
-    if (value === initial) return;
-    const timer = setTimeout(() => {
-      lastPushed.current = value;
-      onSearchRef.current(value);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [value, initial]);
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    onSearch(keyword, location);
+  };
 
   return (
     // z-20 keeps an open dropdown above the results below. The section itself
@@ -69,7 +58,10 @@ export default function SearchBar({ initial, location, onSearch, onLocation, tot
           actually think about work.
         </p>
 
-        <div className="mt-7 flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-2xl shadow-brand-900/30 sm:flex-row sm:items-center">
+        <form
+          onSubmit={submit}
+          className="mt-7 flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-2xl shadow-brand-900/30 sm:flex-row sm:items-center"
+        >
           <div className="flex flex-1 items-center gap-2 px-3">
             <svg
               className="size-5 shrink-0 text-slate-400"
@@ -84,20 +76,20 @@ export default function SearchBar({ initial, location, onSearch, onLocation, tot
             </svg>
             <input
               type="search"
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
               placeholder="Job title, company or skill"
-              aria-label="Search jobs"
+              aria-label="Search by job title, company or skill"
               className="w-full bg-transparent py-3 text-base text-slate-900 outline-none placeholder:text-slate-400"
             />
           </div>
 
           <div className="hidden h-8 w-px bg-slate-200 sm:block" />
 
-          <div className="px-3 sm:min-w-52">
+          <div className="px-3 sm:min-w-48">
             <Select
               value={location}
-              onChange={onLocation}
+              onChange={setLocation}
               ariaLabel="Filter by location"
               placeholder="Any location"
               options={LOCATION_OPTIONS}
@@ -117,7 +109,21 @@ export default function SearchBar({ initial, location, onSearch, onLocation, tot
               }
             />
           </div>
-        </div>
+
+          <button
+            type="submit"
+            className={`shrink-0 rounded-xl bg-brand-600 px-7 py-3 text-base font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:ring-offset-2 ${
+              dirty ? 'ring-2 ring-brand-300 ring-offset-2' : ''
+            }`}
+          >
+            Search
+          </button>
+        </form>
+
+        {/* Fixed height so applying a search does not shift the layout. */}
+        <p className="mt-2 h-4 text-xs text-violet-200">
+          {dirty ? 'Press Enter or click Search to apply' : ''}
+        </p>
       </div>
     </section>
   );
