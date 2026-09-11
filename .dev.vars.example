@@ -1,0 +1,14 @@
+# Template — safe to commit. Copy to `.dev.vars` and put your real value there.
+#   cp .dev.vars.example .dev.vars
+#
+# Read by Wrangler during `npm run dev`, and exposed to the Worker as
+# c.env.DATABASE_URL. This is a separate mechanism from .env: Wrangler does not
+# read .env for Worker bindings, and drizzle-kit does not read .dev.vars —
+# which is why the same value lives in both files locally.
+#
+# In production this value does NOT come from here. It is set once with:
+#   npx wrangler secret put DATABASE_URL
+#
+# NOTE: never put a real credential in this file — .dev.vars.example IS committed.
+
+DATABASE_URL="postgresql://USER:PASSWORD@ep-xxxx-pooler.REGION.aws.neon.tech/neondb?sslmode=require"

@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "prettyjobs-job-search",
+  "main": "./server/index.ts",
+  "compatibility_date": "2026-09-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "assets": {
+    // SPA deep links (/job/123) fall back to index.html...
+    "not_found_handling": "single-page-application",
+    // ...but /api/* must always reach the Worker, including when it is typed
+    // straight into a browser address bar. Without this, opening
+    // /api/jobs in a browser returns index.html instead of JSON.
+    "run_worker_first": ["/api/*"]
+  }
+}
