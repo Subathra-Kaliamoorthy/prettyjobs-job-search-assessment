@@ -6,6 +6,10 @@
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
   "assets": {
+    // The Vite plugin injects this at build time, but declaring it keeps the
+    // config independently valid — without it a fresh clone running
+    // `wrangler deploy` directly (no prior build) fails on a missing directory.
+    "directory": "./dist/client",
     // SPA deep links (/job/123) fall back to index.html...
     "not_found_handling": "single-page-application",
     // ...but /api/* must always reach the Worker, including when it is typed

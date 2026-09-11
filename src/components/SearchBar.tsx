@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LOCATIONS } from '../../db/data';
+import { LOCATIONS } from '../../shared/constants';
 import Select from './Select';
 
 const LOCATION_OPTIONS = [

@@ -1,21 +1,6 @@
-import type { Job } from '../../db/schema';
+import type { JobListItem, JobDetail, JobsResponse } from '../../shared/types';
 
-// The DB row is the source of truth for field names, but JSON serialises
-// `postedAt` as an ISO string rather than a Date.
-export type JobListItem = Omit<Job, 'description' | 'postedAt'> & {
-  postedAt: string;
-  /** First 180 chars of the description, truncated server-side for the card. */
-  excerpt: string;
-};
-export type JobDetail = Omit<Job, 'postedAt'> & { postedAt: string };
-
-export type JobsResponse = {
-  jobs: JobListItem[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-};
+export type { JobListItem, JobDetail, JobsResponse };
 
 export async function fetchJobs(params: URLSearchParams, signal?: AbortSignal): Promise<JobsResponse> {
   const response = await fetch(`/api/jobs?${params.toString()}`, { signal });

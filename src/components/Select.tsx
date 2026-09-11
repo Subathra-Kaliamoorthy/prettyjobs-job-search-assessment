@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type Option = { value: string; label: string };
@@ -36,6 +36,15 @@ export default function Select({
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+
+  // Focus never leaves the trigger, so screen readers need aria-activedescendant
+  // to know which option is highlighted. Without it, arrowing through the list
+  // announces nothing at all.
+  const listId = useId();
+  const optionId = (index: number) => `${listId}-option-${index}`;
+
+  // Type-ahead buffer, replacing what a native <select> did for free.
+  const typeAhead = useRef({ query: '', at: 0 });
 
   const selectedIndex = options.findIndex((option) => option.value === value);
   const selected = selectedIndex >= 0 ? options[selectedIndex] : undefined;
@@ -114,6 +123,23 @@ export default function Select({
       case 'Tab':
         setOpen(false);
         break;
+      default:
+        // Type-ahead: a single printable character jumps to the next option
+        // starting with it; typing several within a second matches a prefix.
+        if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+          event.preventDefault();
+          const now = Date.now();
+          const buffer = now - typeAhead.current.at > 1000 ? '' : typeAhead.current.query;
+          const query = (buffer + event.key).toLowerCase();
+          typeAhead.current = { query, at: now };
+
+          // Start searching after the current option so repeating a letter
+          // cycles through options sharing that initial.
+          const start = buffer ? activeIndex : activeIndex + 1;
+          const order = options.map((_, i) => (start + i) % options.length);
+          const hit = order.find((i) => options[i].label.toLowerCase().startsWith(query));
+          if (hit !== undefined) setActiveIndex(hit);
+        }
     }
   };
 
@@ -124,8 +150,11 @@ export default function Select({
         type="button"
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={onTriggerKeyDown}
+        role="combobox"
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={listId}
+        aria-activedescendant={open ? optionId(activeIndex) : undefined}
         aria-label={ariaLabel}
         className={`flex w-full items-center gap-2 text-left ${triggerClass}`}
       >
@@ -148,6 +177,7 @@ export default function Select({
       {open && (
         <ul
           ref={listRef}
+          id={listId}
           role="listbox"
           aria-label={ariaLabel}
           tabIndex={-1}
@@ -161,6 +191,7 @@ export default function Select({
             return (
               <li
                 key={option.value}
+                id={optionId(index)}
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => choose(option)}

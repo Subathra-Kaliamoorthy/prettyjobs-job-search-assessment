@@ -1,10 +1,12 @@
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { makeDb } from './client';
 import { sql } from 'drizzle-orm';
 import { jobs } from './schema';
 import type { NewJob } from './schema';
-import { INDUSTRIES, LOCATIONS } from './data';
-import type { Industry, Role, ExperienceLevel } from './data';
+import { INDUSTRIES } from './data';
+import { LOCATIONS } from '../shared/constants';
+import type { Industry, Role } from './data';
+import type { ExperienceLevel } from '../shared/constants';
 
 /**
  * Weighted rotation: an industry with weight N occupies N slots, so it takes
@@ -164,7 +166,7 @@ async function main() {
     process.exit(1);
   }
 
-  const db = drizzle(url);
+  const db = makeDb(url);
   const rows = generateJobs();
 
   // Fail loudly rather than silently seeding fewer than required, which would

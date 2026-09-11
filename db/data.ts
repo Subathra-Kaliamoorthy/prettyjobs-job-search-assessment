@@ -1,12 +1,4 @@
-// This module must stay free of any runtime Drizzle import: the frontend
-// imports the filter vocabularies below, and pulling schema.ts in would drag
-// the ORM into the browser bundle.
-
-export const JOB_TYPES = ['full-time', 'part-time', 'contract', 'remote'] as const;
-export const EXPERIENCE_LEVELS = ['entry', 'mid', 'senior', 'lead'] as const;
-
-export type JobType = (typeof JOB_TYPES)[number];
-export type ExperienceLevel = (typeof EXPERIENCE_LEVELS)[number];
+import type { JobType, ExperienceLevel } from '../shared/constants';
 
 export type Role = {
   title: string;
@@ -38,12 +30,6 @@ const LEAD_ONLY: ExperienceLevel[] = ['lead'];
 const DESK: JobType[] = ['full-time', 'part-time', 'contract', 'remote'];
 const ONSITE: JobType[] = ['full-time', 'part-time', 'contract'];
 const FT: JobType[] = ['full-time'];
-
-export const LOCATIONS = [
-  'Bangalore', 'Mumbai', 'Delhi NCR', 'Hyderabad', 'Chennai',
-  'Pune', 'Kolkata', 'Ahmedabad', 'Gurugram', 'Noida',
-  'Kochi', 'Coimbatore', 'Jaipur', 'Chandigarh', 'Indore',
-];
 
 export const INDUSTRIES: Industry[] = [
   {

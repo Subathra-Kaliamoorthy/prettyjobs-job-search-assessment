@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx db/seed.ts",
     "deploy": "npm run build && wrangler deploy"
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.54.7",
+    "@cloudflare/workers-types": "^5.20260911.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^22.20.2",
     "@types/react": "^19.3.0",

@@ -1,4 +1,4 @@
-import { JOB_TYPES, EXPERIENCE_LEVELS } from '../../db/data';
+import { JOB_TYPES, EXPERIENCE_LEVELS } from '../../shared/constants';
 import { titleCase } from '../format';
 
 type Props = {

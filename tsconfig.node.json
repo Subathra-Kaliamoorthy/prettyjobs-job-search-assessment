@@ -1,0 +1,9 @@
+{
+  // Node: the seed script and the build/ORM config files. No DOM lib.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node"]
+  },
+  "include": ["db", "shared", "vite.config.ts", "drizzle.config.ts"]
+}

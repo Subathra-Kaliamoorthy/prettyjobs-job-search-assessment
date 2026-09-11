@@ -1,0 +1,10 @@
+{
+  // Cloudflare Workers (workerd). No DOM lib, so `document` or `localStorage`
+  // in an API route is a compile error rather than a runtime crash.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["@cloudflare/workers-types"]
+  },
+  "include": ["server", "shared", "db/client.ts", "db/schema.ts"]
+}
